@@ -4,6 +4,7 @@ namespace Guttmann\SilverStripe;
 
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Extension;
+use SilverStripe\SiteConfig\SiteConfig;
 
 class SecurityHeaderControllerExtension extends Extension
 {
@@ -14,17 +15,27 @@ class SecurityHeaderControllerExtension extends Extension
 
         $headersToSend = (array) Config::inst()->get('Guttmann\SilverStripe\SecurityHeaderControllerExtension', 'headers');
         $xHeaderMap = (array) Config::inst()->get('Guttmann\SilverStripe\SecurityHeaderControllerExtension', 'x_headers_map');
+        $overrideCSP = (boolean)Config::inst()->get('Guttmann\SilverStripe\SecurityHeaderControllerExtension', 'override_via_cms');
 
         foreach ($headersToSend as $header => $value) {
             if (empty($value)) {
                 continue;
             }
 
-            if ($header === 'Content-Security-Policy' && !$this->browserHasWorkingCSPImplementation()) {
-                continue;
-            }
+            if ($header === 'Content-Security-Policy') {
+                if (!$this->browserHasWorkingCSPImplementation()) {
+                    continue;
+                }
 
-            $response->addHeader($header, $value);
+                if ($overrideCSP && SiteConfig::current_site_config()->OverrideYML === 1) {
+                    $customCSP = SiteConfig::current_site_config()->CustomCSP;
+                    $response->addHeader($header, preg_replace('/\r|\n/', '', $customCSP));
+                } else {
+                    $response->addHeader($header, $value);
+                }
+            } else {
+                $response->addHeader($header, $value);
+            }
 
             if (isset($xHeaderMap[$header])) {
                 foreach ($xHeaderMap[$header] as $xHeader) {
