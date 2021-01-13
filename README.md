@@ -55,7 +55,7 @@ an administrator to define the CSP within the CMS.
 To do this, include the flag in your `app/_config/config.yml` file
 
     Guttmann\SilverStripe\SecurityHeaderControllerExtension:
-    override_CMS: 1
+    override_via_cms: 1
 
 You must then add an extension to the SiteConfig:
 
