@@ -47,9 +47,8 @@ class SecurityHeaderControllerExtension extends Extension
 
     private function browserHasWorkingCSPImplementation()
     {
-        $agent = strtolower(
-            $this->owner->getRequest()->getHeader('User-Agent')
-        );
+        $agent = $this->owner->getRequest()->getHeader('User-Agent') ?? '';
+        $agent = strtolower($agent);
 
         if (strpos($agent, 'safari') === false) {
             return true;
