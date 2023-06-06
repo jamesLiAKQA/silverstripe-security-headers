@@ -16,9 +16,10 @@ class SecurityHeaderControllerExtension extends Extension
         $headersToSend = (array) Config::inst()->get('Guttmann\SilverStripe\SecurityHeaderControllerExtension', 'headers');
         $xHeaderMap = (array) Config::inst()->get('Guttmann\SilverStripe\SecurityHeaderControllerExtension', 'x_headers_map');
         $overrideCSP = (boolean)Config::inst()->get('Guttmann\SilverStripe\SecurityHeaderControllerExtension', 'override_via_cms');
+        $allowEmptyHeaders = (boolean)Config::inst()->get('Guttmann\SilverStripe\SecurityHeaderControllerExtension', 'allow_empty_headers');
 
         foreach ($headersToSend as $header => $value) {
-            if (empty($value)) {
+            if (!$allowEmptyHeaders && empty($value)) {
                 continue;
             }
 
